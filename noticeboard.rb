@@ -5,12 +5,14 @@ set :server, 'thin'
 set :sockets, []
 
 get '/' do
+  $last_msg ||= "curl http://#{request.host_with_port}/display -d msg=\"Hello World\""
+
   if !request.websocket?
     erb :index
   else
     request.websocket do |ws|
       ws.onopen do
-        ws.send("curl http://#{request.host_with_port}/display -d msg=\"Hello World\"")
+        ws.send($last_msg)
         settings.sockets << ws
       end
       ws.onmessage do |msg|
@@ -25,8 +27,8 @@ get '/' do
 end
 
 post '/display' do
-  msg = params[:msg]
-  EM.next_tick { settings.sockets.each{|s| s.send(msg) } }
+  $last_msg = params[:msg]
+  EM.next_tick { settings.sockets.each{|s| s.send($last_msg) } }
 end
 
 __END__
@@ -34,7 +36,7 @@ __END__
 <html>
   <body style="margin:0; padding:0;">
      <div style="height:100vh; width:100vw; margin:0; padding:0;">
-       <span id="msgs" style="font-size:900px"></span>
+       <span id="msgs" style="font-size:900px; text-align:center; display:block"></span>
        <div id="instructions" style="position:absolute; bottom:0; right:0">curl http://<%=request.host_with_port%>/display -d msg="Hello World"</div>
      </div>
   </body>
@@ -59,11 +61,13 @@ __END__
       })();
     }
     function adjust_heights(elem) {
+      elem.style.display = "";
       var parent = elem.parentElement;
       if (elem.offsetHeight>parent.offsetHeight || elem.offsetWidth>parent.offsetWidth) {
         elem.style.fontSize = parseInt(elem.style.fontSize) - 1 + 'px';
         adjust_heights(elem);
       }
+      elem.style.display = "block";
     }
   </script>
 </html>
