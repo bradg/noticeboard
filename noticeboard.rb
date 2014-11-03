@@ -16,7 +16,7 @@ get '/' do
         settings.sockets << ws
       end
       ws.onmessage do |msg|
-        EM.next_tick { settings.sockets.each{|s| s.send(msg) } }
+        EM.next_tick { settings.sockets.each{|s| s.send(msg) } } unless msg == 'ping'
       end
       ws.onclose do
         warn("websocket closed")
@@ -56,7 +56,13 @@ __END__
           return ws;
         };
 
+        var send_ping = function(ws) {
+          ws.send('ping');
+        };
+
         var ws = open_socket();
+
+        setInterval(function() {send_ping(ws)}, 50000);
 
       })();
     }
