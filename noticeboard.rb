@@ -35,6 +35,7 @@ __END__
   <body style="margin:0; padding:0;">
      <div style="height:100vh; width:100vw; margin:0; padding:0;">
        <span id="msgs" style="font-size:900px"></span>
+       <div id="instructions" style="position:absolute; bottom:0; right:0">curl http://<%=request.host_with_port%>/display -d msg="Hello World"</div>
      </div>
   </body>
 
