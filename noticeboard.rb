@@ -5,7 +5,7 @@ set :server, 'thin'
 set :sockets, []
 
 get '/' do
-  $last_msg ||= "curl http://#{request.host_with_port}/display -d msg=\"Hello World\""
+  $last_msg ||= "curl https://#{request.host_with_port}/display -d msg=\"Hello World\""
 
   if !request.websocket?
     erb :index
@@ -49,7 +49,7 @@ __END__
         }(document.getElementById('msgs'));
         
         var open_socket = function() {
-          var ws       = new WebSocket('ws://' + window.location.host + window.location.pathname);
+          var ws       = new WebSocket('wss://' + window.location.host + window.location.pathname);
           ws.onopen    = function()  { show('websocket opened'); };
           ws.onclose   = function()  { show('websocket closed. Trying to open in 10 seconds'); setTimeout(open_socket, 10000); };
           ws.onmessage = function(m) { show(m.data); };
